@@ -9,8 +9,14 @@ export default function App() {
   const [genieDone, setGenieDone] = useState(false);
   const [musicOn, setMusicOn] = useState(false);
 
-  const musicRef = useRef(null);
+  const musicRef = useRef(null); 
   const crackRef = useRef(null);
+  useEffect(() => {
+  if (currentAct === 3 && musicRef.current) {
+    musicRef.current.pause();
+    setMusicOn(false);
+  }
+}, [currentAct]);
   const vp = useViewportSize();
 
   // preload audio
@@ -107,20 +113,21 @@ export default function App() {
 
       {/* Bottom-left music dock (visible) */}
       <div className="musicDock" role="region" aria-label="music control">
-        <div className="musicNote"><strong>kindly turn on the music first</strong> 🎵</div>
-        <button
-          className={`musicBtn ${musicOn ? 'on' : 'off'}`}
-          onClick={toggleMusic}
-          aria-pressed={musicOn}
-        >
-          {musicOn ? "🔊 Music On" : "🔈 Music Off"}
-        </button>
-      </div>
+  <button
+    className={`musicBtn ${musicOn ? 'on' : 'off'}`}
+    onClick={toggleMusic}
+    aria-pressed={musicOn}
+  >
+    {musicOn ? "🔊 Music On" : "🔈 Music Off"}
+  </button>
+</div>
 
       {/* Overlay / Acts */}
       {currentAct && (
         <div className={`overlay overlay--act${currentAct}`} role="dialog" aria-modal="true">
-          <Confetti width={vp.width} height={vp.height} numberOfPieces={currentAct === 3 ? 500 : 240} />
+          {(currentAct === 1 || currentAct === 2) && (
+          <Confetti width={vp.width} height={vp.height} numberOfPieces={240} />
+)}
 
           {/* Act 1 */}
           {currentAct === 1 && (
@@ -152,7 +159,6 @@ export default function App() {
           {/* Act 3 */}
           {currentAct === 3 && (
             <div className="card card--video">
-              <SparkleField />
               <div className="videoWrap">
                 <div className="videoBadge" aria-hidden>🎥</div>
                 {/* portrait videos will fit now (no forced cropping) */}
@@ -193,15 +199,6 @@ function AnimatedBackground() {
     hue: Math.floor(Math.random()*60) - 20
   })), []);
 
-  const ribbons = useMemo(() => Array.from({ length: 5 }, (_, i) => ({
-    id: 'r'+i,
-    top: Math.random()*100,
-    left: Math.random()*100,
-    size: 18 + Math.random()*22,
-    dur: 5 + Math.random()*6,
-    delay: Math.random()*5
-  })), []);
-
   return (
     <div className="bg" aria-hidden>
       {Array.from({ length: 8 }).map((_, i) => <span key={i} className={`bokeh bokeh--${(i%5)+1}`} />)}
@@ -223,18 +220,11 @@ function AnimatedBackground() {
           filter: `hue-rotate(${b.hue}deg)`
         }}>🎈</span>
       ))}
-      {ribbons.map(r => (
-        <span key={r.id} className="ribbon" style={{
-          top: `${r.top}%`,
-          left: `${r.left}%`,
-          fontSize: r.size,
-          animationDuration: `${r.dur}s`,
-          animationDelay: `${r.delay}s`
-        }}>🎀</span>
-      ))}
+      {/* ribbons removed */}
     </div>
   );
 }
+
 
 function PetalRain({ count = 24 }) {
   const petals = useMemo(() => Array.from({ length: count }).map((_, i) => ({
@@ -322,7 +312,6 @@ function useViewportSize(){
 
 /* Scoped CSS inserted by component */
 /* Scoped CSS inserted by component */
-/* Scoped CSS inserted by component */
 function StyleTag(){
   return (
     <style>{`
@@ -386,22 +375,24 @@ function StyleTag(){
 
       /* hero */
       .hero{ display:flex; flex-direction:column; align-items:center; gap:6px; padding: 6px 14px; }
-      .title{font-family:'Great Vibes',cursive;font-size:clamp(26px,6.5vw,52px);margin:0;color:var(--ink);text-shadow:0 2px 0 rgba(255,255,255,.7)}
+      .title{font-family:'Great Vibes',cursive;font-size:clamp(48px, 12vw, 80px);margin:0;color:var(--ink);text-shadow:0 3px 6px rgba(0,0,0,0.15)}, 0 2px 0 rgba(255,255,255,0.7);
       .subtitle{margin:0;color:#6d28d9;font-size:clamp(13px,3.6vw,17px);max-width:92%;line-height:1.3;opacity:.95}
 
       /* eggs - mobile centered vertical stack */
       .eggs{
-        margin: 10px auto 18px;
+        margin: 20px auto:;
         width: 100%;
-        max-width: 380px;
-        display:flex;
-        flex-direction:column;
+        max-width: 360px;
+        display:grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto auto;
+        gap: 20px;
+        justify-items: center;
         align-items:center;
-        gap: 14px;
       }
       .egg{
-        width: 85%;
-        max-width: 220px;   /* ✅ smaller for mobile */
+        width: 100px;
+        max-width: 120px;   /* ✅ smaller for mobile */
         aspect-ratio: 3/4;
         border: none;
         cursor:pointer;
@@ -409,20 +400,34 @@ function StyleTag(){
         background:
           radial-gradient(35% 35% at 50% 18%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 60%),
           radial-gradient(90% 120% at 50% 46%, #ffd4e7 0%, #ff9ed0 50%, #ff7fbd 75%, #ffb86b 100%);
-        box-shadow: 0 12px 28px rgba(0,0,0,.12), 0 0 0 6px rgba(255,255,255,.55) inset, 0 0 20px rgba(246,196,83,.32);
+        box-shadow: 0 6px 14px rgba(0,0,0,.1), 0 0 0 3px rgba(255,255,255,.45) inset;
         transition: transform .18s ease, box-shadow .28s ease;
         animation: eggIdle 3.2s ease-in-out infinite;
         display:block;
         position:relative;
       }
-      @media (min-width: 640px){
+        /* Top egg centered */
+        .egg:nth-child(1){
+        grid-column: 1 / span 2;
+        justify-self: center;
+        }
+        /* Bottom left */
+        .egg:nth-child(2){
+        grid-column: 1;
+        }
+        /* Bottom right */
+        .egg:nth-child(3) {
+        grid-column: 2;
+        }
+    
+      @media (min-width: 500px){
         .eggs{
-          max-width: 780px;
+          max-width: 550px;
           display:grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 18px;
+          gap: 8px;
         }
-        .egg { width: 100%; max-width: 260px; } /* ✅ bigger but not too big */
+        .egg { width: 100%; max-width: 10px; } /* ✅ bigger but not too big */
       }
 
       .egg--1{ filter: hue-rotate(0deg) saturate(1.05); }
@@ -514,17 +519,16 @@ function StyleTag(){
         }
       }
       .musicNote{font-size:12px; color:var(--red); font-weight:800; background:rgba(255,255,255,.92); padding:6px 8px; border-radius:10px; border:1px solid rgba(193,18,31,.18); text-align:center; max-width:240px}
-      .musicBtn{padding:10px 16px; border-radius:18px; font-weight:800; min-width:140px; cursor:pointer; border:2px solid rgba(0,0,0,.06); box-shadow:0 8px 20px rgba(0,0,0,.08)}
+      .musicBtn{padding:6px 10px; border-radius:12px; font-weight:800; min-width:110px; cursor:pointer; border:2px solid rgba(0,0,0,.06); box-shadow:0 8px 20px rgba(0,0,0,.08)}
       .musicBtn.off{ background: var(--red); color:#fff; border-color: rgba(0,0,0,.06) }
       .musicBtn.on{ background: var(--blue); color:#fff; border-color: rgba(0,0,0,.06) }
 
-      @media (max-width: 360px){
+      @media (max-width: 500px){
         .egg{ max-width: 180px }
-        .title{ font-size: clamp(22px,6.5vw,38px) }
-        .subtitle{ font-size: 12.5px }
+        .title{ font-size: clamp(39px,6.5vw,38px) }
+        .subtitle{ font-size: 15.5px }
       }
     `}</style>
   );
 }
-
 

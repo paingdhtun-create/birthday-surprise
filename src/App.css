@@ -40,3 +40,9 @@
 .read-the-docs {
   color: #888;
 }
+
+.bigBouquet {
+  font-size: clamp(2.5rem, 8vw, 4rem);  /* bigger + responsive */
+  display: inline-block;
+}
+
