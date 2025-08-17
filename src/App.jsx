@@ -21,11 +21,11 @@ export default function App() {
 
   // preload audio
   useEffect(() => {
-    musicRef.current = new Audio("/birthday-piano.mp3");
+    musicRef.current = new Audio(`${import.meta.env.BASE_URL}birthday-piano.mp3`);
     musicRef.current.loop = true;
     musicRef.current.volume = 0.5;
 
-    crackRef.current = new Audio("/egg-crack.mp3");
+    crackRef.current = new Audio(`${import.meta.env.BASE_URL}egg-crack.mp3`);
     crackRef.current.volume = 0.9;
 
     return () => {
@@ -125,15 +125,14 @@ export default function App() {
       {/* Overlay / Acts */}
       {currentAct && (
         <div className={`overlay overlay--act${currentAct}`} role="dialog" aria-modal="true">
-          {(currentAct === 1 || currentAct === 2) && (
-          <Confetti width={vp.width} height={vp.height} numberOfPieces={240} />
-)}
+          
+          
 
           {/* Act 1 */}
           {currentAct === 1 && (
             <div className="card">
               <PetalRain count={28} />
-              <div className="emojis" aria-hidden><span>🎀</span><span>💐</span><span>🎈</span></div>
+              <div className="emojis" aria-hidden><span className="bigBouquet">💐</span></div>
               <p className="text">Wishing this bouquet of roses brings you joy. Sorry I couldn't give you real flowers this year, but I will someday.</p>
               <button className="btn" onClick={closeOverlay}>Back to Eggs</button>
             </div>
